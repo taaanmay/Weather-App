@@ -22,6 +22,8 @@
                 
                 <h3>Packing:</h3>
                 <p v-if='weather.anyRain'>We suggest - BRING AN UNBRELLA! It might rain.</p>
+
+                <p v-if='weather.airQuality'>We also suggest - BRING A MASK! The air quality is poor!.</p>
                 
                 <p>You can expect the following kinds of temperatures - pack accordingly:</p>
                 <ul>
@@ -57,6 +59,7 @@
                     city: '',
                     validCity: false,
                     weather: ''
+                    // airQuality:''
                 },
                 methods: {
                     getWeather() {
@@ -65,6 +68,7 @@
                             .then(data => {
                                 this.validCity = data.result.validCity;
                                 this.weather = data.result.weatherData;
+                                // this.airQuality = data.result.airQualityData;
                             });
                     }
                 }

@@ -45,12 +45,14 @@ function getWeather(req, res) {
                 res.json({result: {
                     validCity: false,
                     weatherData: {}
+                    // airQualityData : {}
                 }});
             } else {
                 
                 res.json({result: {
                     validCity: true,
                     weatherData: parseWeather(data)
+                    // airQualityData : parseAirQuality(data)
                 }});
             }
         })
@@ -58,6 +60,7 @@ function getWeather(req, res) {
             res.json({result: {
                 validCity: false,
                 weatherData: {}
+                // airQualityData : {}
             }});
         });
 
@@ -65,6 +68,7 @@ function getWeather(req, res) {
         res.json({result: {
             validCity: false,
             weatherData: {}
+            // airQualityData : {}
         }});
     });
 
@@ -85,7 +89,7 @@ function parseWeather(data) {
     let tempRanges = [false, false, false]
     let day=0;
     for (day = 0; day < 5; day++) {
-        console.log('B');
+        // console.log('B');
         let totalRain = 0;
         let meanTemp = 0;
         let maxWindSpeed = 0;
@@ -94,11 +98,11 @@ function parseWeather(data) {
         // for (step = 0; step < 8; step++) {
         // let weather = data.list[(day * 8) + step];
         let currDay = data.list[day];
-        console.log(currDay);
+        // console.log(currDay);
         let weather = currDay.weather;
-        console.log('weather');
+        // console.log('weather');
         let rainCalc = weather[0];
-        console.log(rainCalc);
+        // console.log(rainCalc);
         if (rainCalc.main=='Rain'){
             let rainLevel = currDay.rain;
             totalRain += rainLevel['3h'];
@@ -113,7 +117,7 @@ function parseWeather(data) {
         // maxWindSpeed = Math.max(maxWindSpeed, weather.wind.speed);
         
         let wind = currDay.wind;
-        console.log(wind.speed);
+        // console.log(wind.speed);
         maxWindSpeed = wind.speed;
         // }
         dailyForecast.push({
@@ -137,6 +141,36 @@ function parseWeather(data) {
         console.log(sumOfTemp);
         
         // let avgTemp = sumOfTemp/5.0;
+
+
+
+     
+    let bad = false;
+    let city = data.city;
+    let latitude = city.coord.lat;
+    let longitude = city.coord.lon;
+    // console.log(longitude);
+
+    const API_KEY = '3e2d927d4f28b456c6bc662f34350957';
+    let url_AQ = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`;
+    let promise = fetch(url_AQ);
+
+    promise
+        .then(resp => resp.json())
+        .then(data => {console.log(data)
+                        let listData = data.list;
+                        let zeroData = listData[0];
+                        console.log('zeroData');
+                        let main = zeroData.components.pm2_5;
+                        console.log(main);
+                        if(main>10){
+                            bad = true;
+                            
+                        }
+                    })
+                                        
+                        
+
         
         
 
@@ -144,10 +178,63 @@ function parseWeather(data) {
     console.log(anyRain);
     console.log(tempRanges);
     console.log(dailyForecast);
+    console.log("Air Quality "+bad);
     return {
         cityFullName: cityFullName,
         anyRain: anyRain,
         tempRanges: tempRanges,
-        dailyForecast: dailyForecast
+        dailyForecast: dailyForecast,
+        airQuality:bad
     };
 }
+
+// function parseAirQuality(data){
+//     console.log("parseWeather Method Called");
+//     let bad = false;
+//     let city = data.city;
+//     let latitude = city.coord.lat;
+//     let longitude = city.coord.lon;
+//     // console.log(longitude);
+
+//     const API_KEY = '3e2d927d4f28b456c6bc662f34350957';
+//     let url_AQ = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`;
+//     let promise = fetch(url_AQ);
+
+//     promise
+//         .then(resp => resp.json())
+//         .then(data => {console.log(data)
+//                         let listData = data.list;
+//                         let zeroData = listData[0];
+//                         console.log('zeroData');
+//                         let main = zeroData.components.pm2_5;
+//                         console.log(main);
+//                         if(main>10){
+//                             bad = true;
+//                         }
+//                         console.log(bad);                    
+//                         return {
+//                                 airQuality: bad
+//                                 };
+//                         })
+    
+//     // promise
+//     //     .then(resp => resp.json())
+//     //     .then(data => {console.log(data)
+//     //                     let listData = data.list;
+//     //                     let zeroData = listData[0];
+//     //                     console.log('zeroData');
+//     //                     let main = zeroData.components.pm2_5;
+//     //                     console.log(main);
+//     //                     if(main>10){
+//     //                         bad = true;
+//     //                     }
+//     //                     console.log(bad);                    
+//     //                     return {
+//     //                             bad: bad
+//     //                             };
+//     //                     })
+    
+    
+        
+
+// }
